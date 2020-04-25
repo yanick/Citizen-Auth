@@ -37,3 +37,25 @@ exports.find = id => Promise.resolve(users.find(user => user.id === id));
  */
 exports.findByUsername = username =>
   Promise.resolve(users.find(user => user.username === username));
+
+/**
+ * Creates a new user. Throws an error if the user already exists.
+ */
+exports.create = async ({
+    username, password, name
+}) => {
+    if( await exports.findByUsername(username) )
+        throw new Error(`user ${username} already exists`);
+
+    const id = 1 + Math.max(0, ...users.map(({id})=>id));
+
+    const newUser = {
+        id,
+        username,
+        password,
+        name,
+    };
+
+    users.push(newUser);
+    return newUser;
+};
