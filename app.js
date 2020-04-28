@@ -16,6 +16,7 @@ const site           = require('./site');
 const token          = require('./token');
 const user           = require('./user');
 const usersDb   = require('./db/users');
+const utils = require('./utils');
 
 console.log('Using MemoryStore for the data store');
 console.log('Using MemoryStore for the Session');
@@ -70,6 +71,37 @@ app.get('/api/tokeninfo', token.info);
 // Mimicking google's token revoke endpoint from
 // https://developers.google.com/identity/protocols/OAuth2WebServer
 app.get('/api/revoke', token.revoke);
+
+
+// JWT auth
+// For the simpler case where we want to get a token
+// that proves who we are without having to have the client
+// auth side of things. As long as all apps have the
+// public key, they will be able to confirm that the
+// token is valid, without having to poke back the auth
+// service
+app.post( '/jwt/auth', async(req,res,next) => {
+    const {username,password} = req.body;
+
+    const user = await usersDb.findByUsername(username);
+
+    if(user && user.password === password ) {
+        res.json({
+            token: utils.createToken({
+                sub: {
+                    roles: user.roles,
+                    name: user.name
+                }
+            })
+        })
+    }
+
+    next();
+
+
+
+});
+
 
 // static resources for stylesheets, images, javascript files
 app.use(express.static(path.join(__dirname, 'public')));

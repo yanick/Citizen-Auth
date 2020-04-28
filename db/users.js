@@ -15,11 +15,13 @@ const users = [{
   username : 'bob',
   password : 'secret',
   name     : 'Bob Smith',
+  roles:  [ 'user' ],
 }, {
   id       : '2',
   username : 'joe',
   password : 'password',
   name     : 'Joe Davis',
+  roles:  [ 'sysadmin' ],
 }];
 
 /**
@@ -57,5 +59,6 @@ exports.create = async ({
     };
 
     users.push(newUser);
+
     return newUser;
 };
